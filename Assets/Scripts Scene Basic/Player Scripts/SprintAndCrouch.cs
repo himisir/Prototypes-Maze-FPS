@@ -39,41 +39,22 @@ public class SprintAndCrouch : MonoBehaviour
 
     void Update()
     {
-        //ShiftIssuePatch();
         Crouch();
-        //Sprint();
+        Sprint();
 
     }
-
-    public bool isShiftDown;
-    void ShiftIssuePatch()
-    {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            Debug.Log("Shift Down");
-            isShiftDown = true;
-        }
-        if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            Debug.Log("Shift Up");
-            isShiftDown = false;
-        }
-    }
-
 
     void Sprint()
     {
         if (isCrouching) return;
-        // if (Input.GetKey(KeyCode.LeftShift))
-        if (isShiftDown)
+        if (Input.GetKey(KeyCode.E)) //Having issue with Shift key, will fix it later. 
         {
 
             isSprinting = true;
             playerMovement.speed = sprintSpeed;
             SetSound(sprintStepDistance, sprintVolumeMin, sprintVolumeMax);
         }
-        //if (Input.GetKeyUp(KeyCode.LeftShift))
-        else
+        else if (Input.GetKeyUp(KeyCode.E))
         {
             isSprinting = false;
             playerMovement.speed = walkSpeed;
