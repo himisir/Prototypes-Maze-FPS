@@ -5387,12 +5387,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d70f3166874c49249b7973989dc3fb23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprintSpeed: 10
-  walkSpeed: 5
-  crouchSpeed: 2
   isCrouching: 0
   isSprinting: 0
   playerFootSteps: {fileID: 1577157794}
+  sprintDurationLimiter: 3
+  sprintCoolDown: 5
+  sprintDuration: 0
+  sprintCoolDownCounter: 0
+  isCanSprint: 0
 --- !u!114 &1358342593
 MonoBehaviour:
   m_ObjectHideFlags: 0

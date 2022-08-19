@@ -26,7 +26,12 @@ public class SprintAndCrouch : MonoBehaviour
     private float sprintStepDistance = 0.2f;
     private float crouchStepDistance = 0.5f;
 
-
+    //sprint Cool down stuff
+    public float sprintDurationLimiter = 5f;
+    public float sprintCoolDown = 10f;
+    [SerializeField] private float sprintDuration = 0f;
+    [SerializeField] private float sprintCoolDownCounter = 0f;
+    [SerializeField] private bool isCanSprint;
     void Start()
     {
         playerMovement = GetComponent<PlayerMovement>();
@@ -34,32 +39,92 @@ public class SprintAndCrouch : MonoBehaviour
         playerFootSteps.stepDistance = walkStepDistance;
         playerFootSteps.volumeMin = walkVolumeMin;
         playerFootSteps.volumeMax = walkVolumeMax;
+        isCanSprint = true;
 
     }
 
     void Update()
     {
+        //SprintCoolDown();
         Crouch();
         Sprint();
 
+
     }
+
+
+
 
     void Sprint()
     {
-        if (isCrouching) return;
-        if (Input.GetKey(KeyCode.E)) //Having issue with Shift key, will fix it later. 
-        {
 
-            isSprinting = true;
-            playerMovement.speed = sprintSpeed;
-            SetSound(sprintStepDistance, sprintVolumeMin, sprintVolumeMax);
+        if (isCrouching)
+        {
+            sprintDuration = 0;
+            if (sprintCoolDownCounter > 0)
+            {
+                sprintCoolDownCounter -= Time.deltaTime;
+            }
+            else sprintCoolDownCounter = 0;
+            return;
         }
-        else if (Input.GetKeyUp(KeyCode.E))
+        if (isCanSprint)
+        {
+            if (Input.GetKey(KeyCode.E) && (this.GetComponent<CharacterController>().velocity.sqrMagnitude > 0)) //Having issue with Shift key, will fix it later. 
+            {
+
+                sprintDuration += Time.deltaTime;
+                if (sprintDuration >= sprintDurationLimiter)
+                {
+                    sprintDuration = sprintDurationLimiter;
+                    isCanSprint = false;
+                    sprintCoolDownCounter = sprintCoolDown;
+                    return;
+                }
+                isSprinting = true; playerMovement.speed = sprintSpeed;
+                SetSound(sprintStepDistance, sprintVolumeMin, sprintVolumeMax);
+
+
+            }
+            else
+            {
+                isSprinting = false;
+                if (sprintCoolDownCounter > 0)
+                {
+                    sprintCoolDownCounter -= Time.deltaTime;
+                }
+                else
+                {
+                    sprintCoolDownCounter = 0;
+                    isCanSprint = true;
+                    sprintDuration = 0f;
+                }
+
+                //
+
+                playerMovement.speed = walkSpeed;
+                SetSound(walkStepDistance, walkVolumeMin, walkVolumeMax);
+            }
+        }
+        else
         {
             isSprinting = false;
+            if (sprintCoolDownCounter > 0)
+            {
+                sprintCoolDownCounter -= Time.deltaTime;
+            }
+            else
+            {
+                sprintCoolDownCounter = 0;
+                isCanSprint = true;
+                sprintDuration = 0f;
+            }
+            //
             playerMovement.speed = walkSpeed;
             SetSound(walkStepDistance, walkVolumeMin, walkVolumeMax);
+
         }
+
     }
     void Crouch()
     {
@@ -89,4 +154,31 @@ public class SprintAndCrouch : MonoBehaviour
         playerFootSteps.volumeMax = _volumeMax;
     }
 
+
+    void SprintCoolDown() //Asses sprint cool down feature; 
+    {
+        if (isSprinting)
+        {
+            if (sprintDuration < sprintDurationLimiter)
+            {
+                sprintDuration += Time.deltaTime;
+            }
+            else
+            {
+                sprintCoolDownCounter = sprintCoolDown;
+                isSprinting = false;
+            }
+        }
+        else
+        {
+            sprintDuration = 0f;
+            if (sprintCoolDownCounter > 0)
+                sprintCoolDownCounter -= Time.deltaTime;
+            else
+            {
+                sprintCoolDownCounter = 0;
+            }
+        }
+        isCanSprint = (sprintCoolDownCounter <= 0) ? true : false;
+    }
 }
